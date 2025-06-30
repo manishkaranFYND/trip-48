@@ -1,17 +1,24 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
-import { useState } from "react";
+import React, { useState } from "react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import { ChevronDown, ChevronUp, X } from "lucide-react";
 
+interface InterestSelectorProps{
+    interests:string[];
+    setInterest:(value:string[])=>void
+}
+
 const ALL_INTERESTS = [
   "nature",
   "hiking",
   "cafes",
   "adventure",
+  "museum",
   "reading",
   "cinema",
   "fitness",
@@ -20,32 +27,30 @@ const ALL_INTERESTS = [
   "art",
 ];
 
-export function InterestSelector() {
-  const [selected, setSelected] = useState<string[]>([
-    "nature",
-    "hiking",
-    "cafes",
-    "adventure",
-  ]);
+
+const  InterestSelector:React.FC<InterestSelectorProps>=({interests,setInterest})=> {
+//   const [selected, setSelected] = useState<string[]>(interest);
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
-  const toggleInterest = (interest: string) => {
-    setSelected((prev) =>
-      prev.includes(interest)
-        ? prev.filter((i) => i !== interest)
-        : [...prev, interest]
-    );
+  const toggleInterest = (selectedInterest: string) => {
+    if (interests.includes(selectedInterest)) {
+    setInterest(interests.filter((i) => i !== selectedInterest));
+  } else {
+    setInterest([...interests, selectedInterest]);
+  }
   };
 
-  const removeInterest = (interest: string) => {
-    setSelected((prev) => prev.filter((i) => i !== interest));
+  const removeInterest = (selectedInterest: string) => {
+    setInterest(interests.filter((i)=>i!=selectedInterest))
   };
+
+  console.log("interestssss",interests)
 
   return (
-    <div className="p-4 max-w-xl mx-auto bg-white border rounded-xl shadow-md">
+    <div className="px-4 max-w-xl mx-auto bg-white border rounded-xl shadow-md">
       {/* Selected badges */}
-      <div className="flex flex-wrap gap-2 mb-4">
-        {selected.map((interest) => (
+      <div className="flex flex-wrap gap-2 mt-2">
+        {interests.length!==0 && interests.map((interest) => (
           <Badge
             key={interest}
             variant="outline"
@@ -67,7 +72,7 @@ export function InterestSelector() {
       <Button
         variant="ghost"
         onClick={() => setIsOpen((prev) => !prev)}
-        className="mb-3 flex items-center gap-2 text-gray-700"
+        className="flex items-center gap-2 text-gray-700"
       >
         {isOpen ? (
           <ChevronUp className="w-4 h-4" />
@@ -88,7 +93,7 @@ export function InterestSelector() {
               >
                 <Checkbox
                   id={`checkbox-${interest}`}
-                  checked={selected.includes(interest)}
+                  checked={interests.includes(interest)}
                   onCheckedChange={() => toggleInterest(interest)}
                 />
                 {interest}
@@ -100,3 +105,5 @@ export function InterestSelector() {
     </div>
   );
 }
+
+export default InterestSelector;

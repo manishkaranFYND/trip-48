@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
+import { UserPreferences } from "@/app/components/questModal";
 import axios from "axios";
 import { clsx, type ClassValue } from "clsx"
 import { headers } from "next/headers";
@@ -10,7 +11,8 @@ export function cn(...inputs: ClassValue[]) {
 
 
 
-const generateQuest=async()=>{
+const generateQuest=async(data: UserPreferences)=>{
+  console.log("DAtaaaaa from Quest>>>",data)
     const geminiKey=process.env.NEXT_PUBLIC_GEMINI_API_KEY;
 
   console.log("Function initiateddddd",geminiKey)
@@ -35,25 +37,25 @@ const generateQuest=async()=>{
     "cafes",
   ]
   }
-  const { location, groupType, groupSize, budget, duration, interests } = sampleInput;
+  const { location, groupType, groupSize, budget, duration, interests } = data;
 
-  const interestsList = interests.map(i => `**${i}**`).join(", ");
-  const tagsArray = interests.map(i => `"${i}"`).concat([
-    `"${location.city.toLowerCase()}"`,
-    `"${location.area.toLowerCase()}"`
+  const interestsList = (interests ?? []).map(i => `**${i}**`)?.join(", ");
+  const tagsArray = (interests ?? []).map(i => `"${i}"`).concat([
+    `"${location.city?.toLowerCase()}"`,
+    `"${location.area?.toLowerCase()}"`
   ]).join(", ");
 
   const questGenerationPrompt = `
-  You are an expert AI travel guide trained to create highly personalized, fun, and immersive weekend quests for a group of *${groupType}* based in **${location.area}, ${location.city}, ${location.state}, ${location.country}**. The group has ${groupSize} people, a budget between ₹${budget.min} and ₹${budget.max}, and approximately **${duration}** for the experience.
+  You are an expert AI travel guide trained to create highly personalized, fun, and immersive weekend quests for a group of *${groupType}* based in **${location.area}, ${location.city}, ${location.state}, ${location.country}**. The group has ${groupSize} people, a budget between ₹${500} and ₹${budget}, and approximately **${duration}** for the experience.
 
   Their interests include: ${interestsList}.
 
   Your goal is to generate **3 rich, highly engaging quests** that offer an unforgettable weekend experience within the specified budget and time. Use precise locations by leveraging **Google Maps or Apple Maps** data (including coordinates) to suggest **real activities, cafes, parks, cultural spots**, and **hidden gems**.
 
   Each quest must:
-  - Fit the ₹${budget.min}–₹${budget.max} budget range
+  - Fit the ₹${500}–₹${budget} budget range
   - Be suitable for a group of ${groupSize} ${groupType}
-  - Be tailored to their interests: ${interests.join(", ")}
+  - Be tailored to their interests: ${interests?.join(", ")}
   - Fit within or slightly below ${duration}
   - Be located within 45–60 minutes max from ${location.area}
   - Include **detailed activities** with title, description, cost, time, location, coordinates, instructions, and tips
@@ -78,8 +80,8 @@ const generateQuest=async()=>{
         "category": "[e.g. nature, urban, culture]",
         "duration_hours": [integer],
         "difficulty_level": [1–5],
-        "min_budget": ${budget.min},
-        "max_budget": ${budget.max},
+        "min_budget": ${500},
+        "max_budget": ${budget},
         "min_group_size": ${groupSize},
         "max_group_size": ${groupSize},
         "rating_avg": [float between 4.0 and 5.0],
@@ -125,7 +127,7 @@ const generateQuest=async()=>{
     ],
     "user_feedback": {
       "personalization_score": [int out of 100],
-      "budget_optimization": "All quests fit within your ₹${budget.min}–₹${budget.max} budget",
+      "budget_optimization": "All quests fit within your ₹${500}–₹${budget} budget",
       "distance_optimization": "[how far quests are]",
       "group_size_match": "All activities suitable for ${groupSize} people",
       "duration_match": "All quests fit your ${duration} timeframe"
@@ -182,7 +184,7 @@ const generateQuest=async()=>{
   console.log("Quest Response::::",responseQuest);
 
 
-
+  return responseQuest;
 
 }
 
