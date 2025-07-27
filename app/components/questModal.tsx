@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Sparkles, Target } from "lucide-react";
 import { Clock, Users } from "lucide-react";
-import generateQuest from "@/lib/utils";
+
 import QuestSearchButton from "./questSearchButton";
 import SearchComponent from "./searchComponent";
 import { Slider } from "@/components/ui/slider";
@@ -46,10 +46,29 @@ const [interests, setInterests] = useState<string[]>([]);
     if (!questPreference) return;
     try {
       setIsLoading(true);
-      const response = await generateQuest(questPreference);
-      console.log("Quest response:", response);
+      
+      const response = await fetch('/api/generate/quests', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(questPreference),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to generate quest');
+      }
+
+      const questData = await response.json();
+      console.log("Quest response:", questData);
+      
+      // You can store the quest data in state here or redirect to a quest page
+      // For example: setGeneratedQuests(questData.quests);
+      
     } catch (error) {
       console.error("Quest fetch failed", error);
+      // Handle error - show toast notification, error state, etc.
     } finally {
       setIsLoading(false);
     }
