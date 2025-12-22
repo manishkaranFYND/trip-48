@@ -62,6 +62,38 @@ export interface Database {
           updated_at?: string
         }
       }
+      quests: {
+        Row: {
+          id: string
+          user_id: string
+          quest_key: string
+          quest_data: Json
+          preferences: Json
+          location: string
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          quest_key: string
+          quest_data: Json
+          preferences: Json
+          location: string
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          quest_key?: string
+          quest_data?: Json
+          preferences?: Json
+          location?: string
+          created_at?: string
+          updated_at?: string
+        }
+      }
     }
   }
 }
