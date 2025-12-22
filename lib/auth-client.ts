@@ -9,14 +9,32 @@ export const authClient = createAuthClient({
 
 })
 
-export const signIn = async () => {
-    console.log("New Sign In Initiatedd:::::::>")
-    const data = await authClient.signIn.social({
-        provider: "google",
-        callbackURL: '/'
-    })
-    console.log("Google Sign In Data recieved::::",data);
-    return data;
+export const signIn = {
+    social: async () => {
+        console.log("New Sign In Initiatedd:::::::>")
+        const data = await authClient.signIn.social({
+            provider: "google",
+            callbackURL: '/'
+        })
+        console.log("Google Sign In Data recieved::::",data);
+        return data;
+    },
+    email: async (options: {
+        email: string;
+        password: string;
+        rememberMe?: boolean;
+        callbackURL?: string;
+    }) => {
+        console.log("Email Sign In Initiated")
+        const data = await authClient.signIn.email({
+            email: options.email,
+            password: options.password,
+            rememberMe: options.rememberMe,
+            callbackURL: options.callbackURL || '/'
+        })
+        console.log("Email Sign In Data received:", data);
+        return data;
+    }
 }
 
 export const  {

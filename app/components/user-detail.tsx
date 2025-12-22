@@ -15,7 +15,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { authClient, useSession } from "@/lib/auth-client";
 
@@ -58,24 +58,7 @@ interface UserDetailProps {
 export const UserDetail = ({ setOpen, triggerClass }: UserDetailProps) => {
 
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [isSignedIn, setIsSignedIn] = useState(false);
-   
-
-  useEffect(() => {
-    const checkSession = async () => {
-      const session = await authClient.getSession();
-      if (session) {
-        setIsSignedIn(true);
-      } else {
-        setIsSignedIn(false);
-      }
-    };
-
-    checkSession();
-  }, []);
-
-    const { data: session, isPending, error, refetch } = authClient.useSession();
-
+  const { data: session, isPending, error, refetch } = useSession();
 
   const handleLinkClick =
     (href: string) =>
@@ -86,13 +69,12 @@ export const UserDetail = ({ setOpen, triggerClass }: UserDetailProps) => {
 
     const handleSignOut=async()=>{
         await authClient.signOut();
-        setIsSignedIn(false);
         refetch();
     }
 
   return (
     <>
-      {isSignedIn ? (
+      {session ? (
       <DropdownMenu open={dropdownOpen} onOpenChange={setDropdownOpen}>
         <DropdownMenuTrigger
           className={cn(
@@ -143,7 +125,7 @@ export const UserDetail = ({ setOpen, triggerClass }: UserDetailProps) => {
         </DropdownMenuContent>
       </DropdownMenu>
       ) : (
-        <Link href="/auth/login" className="sm:my-5 my-4 inline-block">
+        <Link href="/login" className="sm:my-5 my-4 inline-block">
           <Button variant="default" size="sm" className="sm:px-5 px-3">
             Sign In
           </Button>

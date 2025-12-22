@@ -12,6 +12,7 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { signIn } from "@/lib/auth-client";
 import axios from "axios";
+import { useRouter } from "next/navigation";
 
 export default function SignIn() {
   const [email, setEmail] = useState("");
@@ -19,6 +20,7 @@ export default function SignIn() {
   const [loading, setLoading] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const [error,setError]=useState("");
+  const router = useRouter();
 
   const handleCheck=async()=>{
     // setLoading(true);
@@ -34,12 +36,38 @@ export default function SignIn() {
   
   }
 
+  const handleEmailPasswordSignIn = async () => {
+    setLoading(true);
+    setError("");
+    try {
+      const result = await signIn.email({
+        email,
+        password,
+        rememberMe,
+        callbackURL: '/'
+      });
+      console.log("Sign In Result:", result);
+      if (result && !result.error) {
+        router.push('/');
+      } else {
+        setError(result?.error?.message || "Failed to sign in");
+      }
+    } catch (err) {
+      setError(`Failed to sign in: ${err}`);
+      console.log("Error Occurred during Sign In", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleGoogleSignIn = async () => {
         setLoading(true);
+        setError("");
         try {
           console.log("Google Auth Starteddddddd")
-          const result=  await signIn();
+          const result=  await signIn.social();
             console.log("Resultttt",result)
+            // Google sign in handles redirect automatically
         } catch (err) {
             setError(`Failed to sign in with Google: ${err}`);
             console.log("Error Occured while Google Sign In",err)
@@ -60,6 +88,11 @@ export default function SignIn() {
       </CardHeader>
       <CardContent>
         <div className="grid gap-4">
+          {error && (
+            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded text-sm">
+              {error}
+            </div>
+          )}
           <div className="grid gap-2">
               <Label htmlFor="email">Email</Label>
               <Input
@@ -111,9 +144,7 @@ export default function SignIn() {
               type="submit"
               className="w-full"
               disabled={loading}
-              onClick={()=>{
-
-              }}
+              onClick={handleEmailPasswordSignIn}
             >
               {loading ? (
                 <Loader2 size={16} className="animate-spin" />
