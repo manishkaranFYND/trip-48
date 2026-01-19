@@ -63,8 +63,15 @@ const [interests, setInterests] = useState<string[]>([]);
       const questData = await response.json();
       console.log("Quest response:", questData);
       
-      // You can store the quest data in state here or redirect to a quest page
-      // For example: setGeneratedQuests(questData.quests);
+      // Save quest data to localStorage for the listing page
+      if (questData.quests && questData.quests.length > 0) {
+        localStorage.setItem('latest_generated_quests', JSON.stringify(questData));
+        
+        // Redirect to quests listing page after 1 second
+        setTimeout(() => {
+          window.location.href = '/quests';
+        }, 1000);
+      }
       
     } catch (error) {
       console.error("Quest fetch failed", error);
